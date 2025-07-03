@@ -75,7 +75,7 @@ _isr33:
     .fin:
     popad
     iret
-
+```
 void cambiar_tarea_actualmente_en_pantalla() {
 	// hago que la actualmente en pantalla empiece a apuntar a la pantalla dummy
 	//void mmu_map_page(uint32_t cr3, vaddr_t virt, paddr_t phy, uint32_t attrs)
@@ -87,14 +87,15 @@ void cambiar_tarea_actualmente_en_pantalla() {
 	mmu_map_page(obtenerTSS(sched_tasks[actualmente_en_pantalla])->cr3,0x08004000,0xB8000, 7) // 7 = 0b111 osea user, writable y present 
 	mmu_map_page(obtenerTSS(sched_tasks[actualmente_en_pantalla])->cr3,0x08005000,0xB9000, 7) 
 }
-
+```
 la función obtenerTSS es la siguiente:
+```
 ss_t* obtener_TSS(uint16_t segsel) {
 	uint16_t idx = segsel >> 3;
 	∕∕ (esto en realidad se guarda de a partes en la GDT entry)
 	return gdt[idx].base;
 }
-
+```
 ## e. En el mecanismo propuesto las tareas no tienen forma sencilla de saber si “es su turno” de usar la pantalla. Proponga una solución. No se pide código ni pseudocódigo, sólo la idea.
 Podría haber una función en el scheduler que se le pueda pasar como argumento el selector de la tarea y devuelva true si el indice de la tarea en cuestión dentro de sched_tasks se corresponde con el valor de "actualmente_en_pantalla". Y que la tarea pueda llamar indirectamente a esa función a través de una interrupción de software. 
 
